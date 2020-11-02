@@ -2,9 +2,6 @@
 namespace Grav\Plugin;
 
 use Composer\Autoload\ClassLoader;
-use Grav\Common\Config\Config;
-use Grav\Common\Grav;
-use Grav\Common\Page\Page;
 use Grav\Common\Plugin;
 use Grav\Plugin\Directus\Utility\DirectusUtility;
 
@@ -63,9 +60,15 @@ class DirectusPlugin extends Plugin
         ]);
     }
 
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
     public function onPageInitialized()
     {
-        /** @var Page $page */
         $page = $this->grav['page'];
 
         if(isset($page->header()->directusUrl))
