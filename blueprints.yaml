@@ -1,0 +1,43 @@
+name: Directus
+slug: directus
+type: plugin
+version: 0.1.0
+description: a directus api plugin
+icon: plug
+author:
+  name: Erik Konrad
+  email: e_konrad84@yahoo.de
+homepage: https://github.com/erik-konrad/grav-plugin-directus
+keywords: grav, plugin, etc
+bugs: https://github.com/erik-konrad/grav-plugin-directus/issues
+docs: https://github.com/erik-konrad/grav-plugin-directus/blob/develop/README.md
+license: MIT
+
+dependencies:
+  - { name: grav, version: '>=1.6.0' }
+
+form:
+  validation: loose
+  fields:
+    enabled:
+      type: toggle
+      label: PLUGIN_ADMIN.PLUGIN_STATUS
+      highlight: 1
+      default: 0
+      options:
+        1: PLUGIN_ADMIN.ENABLED
+        0: PLUGIN_ADMIN.DISABLED
+      validate:
+        type: bool
+    directus.directusAPIUrl:
+      type: text
+      label: Directus API URL
+    directus.projectName:
+      type: text
+      label: Directus API Project Name
+    directus.email:
+      type: text
+      label: Directus API User / Email
+    directus.password:
+      type: text
+      label: Directus API Password
