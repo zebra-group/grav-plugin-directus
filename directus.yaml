@@ -1,6 +1,8 @@
 enabled: true
 directus:
+  token: 1234567
   email: your@email.com
   password: supersavepassword
   directusAPIUrl: http://your.api.com
   projectName: project-name
+  hookPrefix: your-prefix

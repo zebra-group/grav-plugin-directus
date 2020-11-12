@@ -35,9 +35,15 @@ form:
     directus.projectName:
       type: text
       label: Directus API Project Name
+    directus.token:
+      type: text
+      label: Directus Token
     directus.email:
       type: text
       label: Directus API User / Email
     directus.password:
       type: text
       label: Directus API Password
+    directus.hookPrefix:
+      type: text
+      label: Hook Prefix for GRAV - Webhooks

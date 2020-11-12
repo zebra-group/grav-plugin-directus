@@ -2,8 +2,11 @@
 namespace Grav\Plugin;
 
 use Composer\Autoload\ClassLoader;
+use Grav\Common\Page\Page;
 use Grav\Common\Plugin;
+use Grav\Plugin\Directus\Directus;
 use Grav\Plugin\Directus\Utility\DirectusUtility;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Class DirectusPlugin
@@ -12,6 +15,9 @@ use Grav\Plugin\Directus\Utility\DirectusUtility;
 class DirectusPlugin extends Plugin
 {
 
+    /**
+     * @var DirectusUtility
+     */
     protected $directusUtil;
 
     /**
@@ -56,38 +62,149 @@ class DirectusPlugin extends Plugin
 
         // Enable the main events we are interested in
         $this->enable([
-            'onPageInitialized' => ['onPageInitialized', 0]
+            'onPageInitialized' => ['onPageInitialized', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
         ]);
     }
 
     /**
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function onPageInitialized()
     {
-        $page = $this->grav['page'];
+        $this->directusUtil = new DirectusUtility(
+            $this->config()['directus']['directusAPIUrl'],
+            $this->config()['directus']['projectName'],
+            $this->config()['directus']['email'],
+            $this->config()['directus']['password'],
+            $this->config()['directus']['token']
+        );
 
-        if(isset($page->header()->directusUrl))
-        {
-            $config = $this->config();
-            $directusUtil = new DirectusUtility(
-                $config['directus']['directusAPIUrl'],
-                $config['directus']['projectName'],
-                $config['directus']['email'],
-                $config['directus']['password']
+        $this->processWebHooks($this->grav['uri']->route());
+
+        $directusFile = $this->grav['page']->path() . '/data.json';
+        if(!file_exists($directusFile)) {
+            $this->crawlPage($this->grav['page']);
+        }
+    }
+
+    /**
+     * onTwigSiteVariables
+     */
+    public function onTwigSiteVariables()
+    {
+        $this->grav['twig']->twig_vars['directus'] = new Directus($this->grav, $this->config());
+    }
+
+    /**
+     * @return bool
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    private function refreshGlobalDataFiles() {
+
+        foreach($this->grav['pages']->instances() as $pageObject) {
+            $this->crawlPage($pageObject);
+        }
+        return true;
+    }
+
+    /**
+     * @param Page $page
+     * @return bool
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    private function crawlPage(Page $page) {
+        if(isset($page->header()->directus)) {
+            $requestConfig = $page->header()->directus;
+            $requestUrl = $this->generateRequestUrl(
+                isset($requestConfig['collection']) ? $requestConfig['collection'] : '',
+                isset($requestConfig['id']) ? $requestConfig['id'] : 0,
+                isset($requestConfig['depth']) ? $requestConfig['depth'] : 2,
+                isset($requestConfig['filters']) ? $requestConfig['filters'] : [],
+                isset($requestConfig['limit']) ? $requestConfig['limit'] : -1
             );
+            /** @var ResponseInterface $response */
+            $response = $this->directusUtil->get($requestUrl);
 
-            $result = $directusUtil->get($page->header()->directusUrl);
-
-            if($result->getStatusCode() === 200) {
-                $this->grav['twig']->twig_vars['directus_content'] = $result->toArray();
+            if($response->getStatusCode() === 200) {
+                $this->writeFileToFileSystem($response->toArray(), $page->path());
             } else {
-                $this->grav['debugger']->addMessage('something went from with directus request: ' . $result->getStatusCode());
+                $this->grav['debugger']->addMessage('something went from with directus request: ' . $response->getStatusCode());
             }
         }
+        return true;
+    }
+
+    /**
+     * @param array $data
+     * @param string $path
+     * @param string $filename
+     */
+    private function writeFileToFileSystem(array $data, string $path, string $filename = 'data.json') {
+        try {
+            $fp = fopen($path . '/' . $filename, 'w');
+            fwrite($fp, json_encode($data));
+            fclose($fp);
+        } catch (\Exception $e) {
+            $this->grav['debugger']->addMessage('cant write to filesystem: ' . $e);
+        }
+    }
+
+    /**
+     * @param string $collection
+     * @param int $id
+     * @param int $depth
+     * @param array $filters
+     * @param int $limit
+     * @return string
+     */
+    private function generateRequestUrl(string $collection, int $id = 0, int $depth = 2, array $filters = [], int $limit = -1) {
+        $url = '/items/' . $collection . ($id ? '/' : null);
+
+        if($id) {
+            $url .= (string)$id;
+        }
+        $url .= '?';
+        if($depth > 0) {
+            $url .= 'fields=';
+            for($i = 1; $i <= $depth; $i++) {
+                $url .= '*';
+                $i < $depth ? $url .= '.' : null;
+            }
+        }
+        foreach($filters as $field => $filter) {
+            $url .= '&filter[' . $field . ']' . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
+        }
+        $url .= '&limit=' . (string)$limit;
+        return $url;
+    }
+
+    /**
+     * @param string $route
+     * @return bool
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    private function processWebHooks(string $route) {
+        switch ($route) {
+            case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-global':
+                $this->refreshGlobalDataFiles();
+                break;
+        }
+        return true;
     }
 }

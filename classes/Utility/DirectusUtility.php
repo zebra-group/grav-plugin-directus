@@ -4,6 +4,10 @@ namespace Grav\Plugin\Directus\Utility;
 
 use Symfony\Component\HttpClient\HttpClient;
 
+/**
+ * Class DirectusUtility
+ * @package Grav\Plugin\Directus\Utility
+ */
 class DirectusUtility
 {
     /**
@@ -37,14 +41,19 @@ class DirectusUtility
      * @param string $projectName
      * @param string $email
      * @param string $password
+     * @param string $token
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function __construct(string $apiUrl, string $projectName, string $email = '', string $password = '')
+    public function __construct(string $apiUrl, string $projectName, string $email = '', string $password = '', string $token = '')
     {
         $this->httpClient = HttpClient::create();
         $this->apiServer = $apiUrl . '/' . $projectName;
         $this->email = $email;
         $this->password = $password;
-        $this->token = $this->requestToken();
+        $this->token = $token ? $token : $this->requestToken();
     }
 
     /**
@@ -92,11 +101,10 @@ class DirectusUtility
             'headers' => $this->getAuthorizationHeaders()
         ];
 
-        $response = $this->httpClient->request(
+        return $this->httpClient->request(
             'GET',
             $this->apiServer . $path,
             $options
         );
-        return $response;
     }
 }
