@@ -107,4 +107,33 @@ class DirectusUtility
             $options
         );
     }
+
+    /**
+     * @param string $collection
+     * @param int $id
+     * @param int $depth
+     * @param array $filters
+     * @param int $limit
+     * @return string
+     */
+    public function generateRequestUrl(string $collection, int $id = 0, int $depth = 2, array $filters = [], int $limit = -1) {
+        $url = '/items/' . $collection . ($id ? '/' : null);
+
+        if($id) {
+            $url .= (string)$id;
+        }
+        $url .= '?';
+        if($depth > 0) {
+            $url .= 'fields=';
+            for($i = 1; $i <= $depth; $i++) {
+                $url .= '*';
+                $i < $depth ? $url .= '.' : null;
+            }
+        }
+        foreach($filters as $field => $filter) {
+            $url .= '&filter[' . $field . ']' . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
+        }
+        $url .= '&limit=' . (string)$limit;
+        return $url;
+    }
 }

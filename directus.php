@@ -127,11 +127,11 @@ class DirectusPlugin extends Plugin
     private function crawlPage(Page $page) {
         if(isset($page->header()->directus)) {
             $requestConfig = $page->header()->directus;
-            $requestUrl = $this->generateRequestUrl(
+            $requestUrl = $this->directusUtil->generateRequestUrl(
                 isset($requestConfig['collection']) ? $requestConfig['collection'] : '',
                 isset($requestConfig['id']) ? $requestConfig['id'] : 0,
                 isset($requestConfig['depth']) ? $requestConfig['depth'] : 2,
-                isset($requestConfig['filters']) ? $requestConfig['filters'] : [],
+                isset($requestConfig['filter']) ? $requestConfig['filter'] : [],
                 isset($requestConfig['limit']) ? $requestConfig['limit'] : -1
             );
             /** @var ResponseInterface $response */
@@ -159,35 +159,6 @@ class DirectusPlugin extends Plugin
         } catch (\Exception $e) {
             $this->grav['debugger']->addMessage('cant write to filesystem: ' . $e);
         }
-    }
-
-    /**
-     * @param string $collection
-     * @param int $id
-     * @param int $depth
-     * @param array $filters
-     * @param int $limit
-     * @return string
-     */
-    private function generateRequestUrl(string $collection, int $id = 0, int $depth = 2, array $filters = [], int $limit = -1) {
-        $url = '/items/' . $collection . ($id ? '/' : null);
-
-        if($id) {
-            $url .= (string)$id;
-        }
-        $url .= '?';
-        if($depth > 0) {
-            $url .= 'fields=';
-            for($i = 1; $i <= $depth; $i++) {
-                $url .= '*';
-                $i < $depth ? $url .= '.' : null;
-            }
-        }
-        foreach($filters as $field => $filter) {
-            $url .= '&filter[' . $field . ']' . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
-        }
-        $url .= '&limit=' . (string)$limit;
-        return $url;
     }
 
     /**

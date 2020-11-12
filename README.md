@@ -62,7 +62,7 @@ directus:
     collection: table_name
     depth: 4
     id: 12
-    filters:
+    filter:
         field_name:
             operator: eq
             value: filter_value
@@ -89,7 +89,7 @@ with the filters parameter it is possible to define multiple filters for the req
 title: My Page
 directus:
     collection: users
-    filters:
+    filter:
         full_name:
             operator: eq
             value: John Doe
