@@ -63,9 +63,9 @@ directus:
     depth: 4
     id: 12
     filters:
-        name:
+        field_name:
             operator: eq
-            value: John Doe
+            value: filter_value
         ...
     limit: 6 
 ---
