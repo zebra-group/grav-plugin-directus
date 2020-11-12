@@ -1,7 +1,5 @@
 # Directus Plugin
 
-**This README.md file should be modified to describe the features, installation, configuration, and general usage of the plugin.**
-
 The **Directus** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). a directus api plugin
 
 ## Installation
@@ -42,15 +40,71 @@ enabled: true
 
 Note that if you use the Admin Plugin, a file with your configuration named directus.yaml will be saved in the `user/config/plugins/`-folder once the configuration is saved in the Admin.
 
+```yaml
+directus:
+  token: 1234567
+  email: your@email.com
+  password: supersavepassword
+  directusAPIUrl: http://your.api.com
+  projectName: project-name
+  hookPrefix: your-prefix
+```
+
+In this section, you have to configure the Directus API Access. There are two ways of authentification. The first way is to use a static token. You can find the token in the table with your user credentials on Directus server. Otherwise you have to enter your username and password. This is not neccessary if a security token is given. The plugin will request a temporary authentification token from the API. If a static token is given, the username and password are not used.
+
+The hook prefix is a key for the hook routes. You can change it for security reasons. So, the hooks are accessible under e.g. https://your.site/your-prefix/refresh-global for the global update hook. 
 ## Usage
 
-**Describe how to use the plugin.**
+```md
+---
+title: My Page
+directus:
+    collection: table_name
+    depth: 4
+    id: 12
+    filters:
+        name:
+            operator: eq
+            value: John Doe
+        ...
+    limit: 6 
+---
+```
+### Settings overview
+You have to configure your Directus request in the header section of your .md page file like in the example. The only mandatory setting is the collection argument. If the request settings are correct, the plugin creates a data.json file from the response on the first page reload. You can load the response file in the twig template with {{ directus.get() }}.
 
-## Credits
+### optional parameters
 
-**Did you incorporate third-party code? Want to thank somebody?**
+#### depth
+The depth parameter sets the array depth in the response. Default: 2
+
+#### id
+With the optional id parameter, you can request a single element from a collection.
+
+#### filters
+with the filters parameter it is possible to define multiple filters for the request.
+
+```md
+---
+title: My Page
+directus:
+    collection: users
+    filters:
+        full_name:
+            operator: eq
+            value: John Doe
+        birth_date:
+            operator: not
+            value: 1984
+---
+```
+Here is a configuration sample for the filters section. An overview with all possible operators you can find here: https://docs.directus.io/api/query/filter.html
+If no operator is set, the default operator is "=".
+
+#### limit
+This is self explaining. This limits the amount of json array items to given limit. default: -1 (all items) 
 
 ## To Do
 
-- [ ] Future plans, if any
+- [flexible Webhooks] - this features is planned for the near future. With flexible webhooks it will be possible to refresh single pages per remote request.
 
