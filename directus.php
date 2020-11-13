@@ -2,11 +2,8 @@
 namespace Grav\Plugin;
 
 use Composer\Autoload\ClassLoader;
-use Grav\Common\Page\Page;
 use Grav\Common\Plugin;
 use Grav\Plugin\Directus\Directus;
-use Grav\Plugin\Directus\Utility\DirectusUtility;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Class DirectusPlugin
@@ -14,11 +11,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class DirectusPlugin extends Plugin
 {
-
-    /**
-     * @var DirectusUtility
-     */
-    protected $directusUtil;
 
     /**
      * @return array
@@ -69,26 +61,15 @@ class DirectusPlugin extends Plugin
 
     /**
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function onPageInitialized()
     {
-        $this->directusUtil = new DirectusUtility(
-            $this->config()['directus']['directusAPIUrl'],
-            $this->config()['directus']['projectName'],
-            $this->config()['directus']['email'],
-            $this->config()['directus']['password'],
-            $this->config()['directus']['token']
-        );
 
         $this->processWebHooks($this->grav['uri']->route());
-
-        $directusFile = $this->grav['page']->path() . '/data.json';
-        if(!file_exists($directusFile)) {
-            $this->crawlPage($this->grav['page']);
-        }
     }
 
     /**
@@ -108,57 +89,11 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     private function refreshGlobalDataFiles() {
-
+        $directus = new Directus($this->grav, $this->config());
         foreach($this->grav['pages']->instances() as $pageObject) {
-            $this->crawlPage($pageObject);
+            $directus->crawlPage($pageObject);
         }
         return true;
-    }
-
-    /**
-     * @param Page $page
-     * @return bool
-     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
-     */
-    private function crawlPage(Page $page) {
-        if(isset($page->header()->directus)) {
-            $requestConfig = $page->header()->directus;
-            $requestUrl = $this->directusUtil->generateRequestUrl(
-                isset($requestConfig['collection']) ? $requestConfig['collection'] : '',
-                isset($requestConfig['id']) ? $requestConfig['id'] : 0,
-                isset($requestConfig['depth']) ? $requestConfig['depth'] : 2,
-                isset($requestConfig['filter']) ? $requestConfig['filter'] : [],
-                isset($requestConfig['limit']) ? $requestConfig['limit'] : -1
-            );
-            /** @var ResponseInterface $response */
-            $response = $this->directusUtil->get($requestUrl);
-
-            if($response->getStatusCode() === 200) {
-                $this->writeFileToFileSystem($response->toArray(), $page->path());
-            } else {
-                $this->grav['debugger']->addMessage('something went from with directus request: ' . $response->getStatusCode());
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @param array $data
-     * @param string $path
-     * @param string $filename
-     */
-    private function writeFileToFileSystem(array $data, string $path, string $filename = 'data.json') {
-        try {
-            $fp = fopen($path . '/' . $filename, 'w');
-            fwrite($fp, json_encode($data));
-            fclose($fp);
-        } catch (\Exception $e) {
-            $this->grav['debugger']->addMessage('cant write to filesystem: ' . $e);
-        }
     }
 
     /**

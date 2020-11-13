@@ -116,7 +116,7 @@ class DirectusUtility
      * @param int $limit
      * @return string
      */
-    public function generateRequestUrl(string $collection, int $id = 0, int $depth = 2, array $filters = [], int $limit = -1) {
+    public function generateRequestUrl(string $collection, int $id = 0, int $depth = 2, array $filters = [], int $limit = -1, string $sort = '') {
         $url = '/items/' . $collection . ($id ? '/' : null);
 
         if($id) {
@@ -134,6 +134,11 @@ class DirectusUtility
             $url .= '&filter[' . $field . ']' . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
         }
         $url .= '&limit=' . (string)$limit;
+        if($sort) {
+            $url .= '&sort=' . $sort;
+        }
+
+
         return $url;
     }
 }
