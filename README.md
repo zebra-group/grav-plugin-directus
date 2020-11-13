@@ -67,11 +67,12 @@ directus:
             operator: eq
             value: filter_value
         ...
-    limit: 6 
+    limit: 6
+    sort: sorting_field
 ---
 ```
 ### Settings overview
-You have to configure your Directus request in the header section of your .md page file like in the example. The only mandatory setting is the collection argument. If the request settings are correct, the plugin creates a data.json file from the response on the first page reload. You can load the response file in the twig template with {{ directus.get() }}.
+You have to configure your Directus request in the header section of your .md page file like in the example. The only mandatory setting is the collection argument. If the request settings are correct, the plugin creates a data.json file from the response on the first page reload. You can load the response file in the twig template with {% set content = directus.get(page) %}.
 
 ### optional parameters
 
@@ -83,7 +84,6 @@ With the optional id parameter, you can request a single element from a collecti
 
 #### filters
 with the filters parameter it is possible to define multiple filters for the request.
-
 ```md
 ---
 title: My Page
@@ -103,6 +103,9 @@ If no operator is set, the default operator is "=".
 
 #### limit
 This is self explaining. This limits the amount of json array items to given limit. default: -1 (all items) 
+
+#### sort
+The sort parameter defines, which field is used for the response array sorting. More options here: https://docs.directus.io/api/query/sort.html
 
 ## To Do
 
