@@ -126,6 +126,11 @@ class Directus {
     /**
      * @param Page $page
      * @return mixed|null
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function get(Page $page) {
 
@@ -139,8 +144,7 @@ class Directus {
         if($result) {
             return $result;
         }
-        else {
-            return null;
-        }
+        $this->grav['debugger']->addMessage('Directus: no data.json');
+        return null;
     }
 }
