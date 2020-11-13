@@ -71,7 +71,7 @@ class Directus {
                 $this->writeFileToFileSystem($response->toArray(), $page->path());
                 return true;
             } catch (\Exception $e) {
-                $this->grav['debugger']->addMessage('something went from with directus request: ' . $e);
+                $this->grav['debugger']->addException($e);
             }
         }
         return false;
@@ -88,7 +88,7 @@ class Directus {
             fwrite($fp, json_encode($data));
             fclose($fp);
         } catch (\Exception $e) {
-            $this->grav['debugger']->addMessage('cant write to filesystem: ' . $e);
+            $this->grav['debugger']->addException($e);
         }
     }
 
@@ -117,7 +117,7 @@ class Directus {
                 }
             }
         } catch (\Exception $e) {
-            $this->grav['debugger']->addMessage('cant read from filesystem: ' . $e);
+            $this->grav['debugger']->addException($e);
         }
         return false;
     }

@@ -90,6 +90,7 @@ class DirectusPlugin extends Plugin
      */
     private function refreshGlobalDataFiles() {
         $directus = new Directus($this->grav, $this->config());
+
         foreach($this->grav['pages']->instances() as $pageObject) {
             $directus->crawlPage($pageObject);
         }
