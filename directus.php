@@ -94,7 +94,12 @@ class DirectusPlugin extends Plugin
         foreach($this->grav['pages']->instances() as $pageObject) {
             $directus->crawlPage($pageObject);
         }
-        return true;
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Global import completed'
+        ]);
+        exit;
     }
 
     /**
@@ -111,7 +116,19 @@ class DirectusPlugin extends Plugin
             case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-global':
                 $this->refreshGlobalDataFiles();
                 break;
+            case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-single':
+                $this->refreshSingleDataFiles();
+                break;
         }
         return true;
+    }
+
+    private function refreshSingleDataFiles() {
+        //todo: not implemented yet
+        echo json_encode([
+            'status' => 'success',
+            'message' => $_REQUEST
+        ]);
+        exit;
     }
 }
