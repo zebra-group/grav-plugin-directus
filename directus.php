@@ -116,7 +116,7 @@ class DirectusPlugin extends Plugin
             case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-global':
                 $this->refreshGlobalDataFiles();
                 break;
-            case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-single':
+            case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-single/*':
                 $this->refreshSingleDataFiles();
                 break;
         }
