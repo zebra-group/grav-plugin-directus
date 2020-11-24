@@ -137,7 +137,6 @@ class DirectusPlugin extends Plugin
      */
     private function refreshSingleDataFiles() {
         $directus = new Directus($this->grav, $this->config());
-
         if( isset($_REQUEST['update']) || isset($_REQUEST['new']) || isset($_REQUEST['delete']))
         {
             $requestConfig = json_decode($_REQUEST[key($_REQUEST)], true);
@@ -150,14 +149,14 @@ class DirectusPlugin extends Plugin
                             if ((int)$directusConfig['id'] === (int)$requestConfig['id']) {
                                 $directus->crawlPage($pageObject);
                             } else {
-                                return;
+                                continue;
                             }
                         } elseif (!isset($directusConfig['id']) && !isset($directusConfig['filter'])) {
                             $directus->crawlPage($pageObject);
                         } elseif (isset($directusConfig['filter'])) {
                             $directus->crawlPage($pageObject);
                         } else {
-                            return;
+                            continue;
                         }
                     }
 
