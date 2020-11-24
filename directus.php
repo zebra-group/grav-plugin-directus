@@ -116,19 +116,60 @@ class DirectusPlugin extends Plugin
             case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-global':
                 $this->refreshGlobalDataFiles();
                 break;
-            case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-single/*':
-                $this->refreshSingleDataFiles();
+            case '/' . $this->config()['directus']['hookPrefix'] . '/refresh-single':
+                try {
+                    $this->refreshSingleDataFiles();
+                } catch (\Exception $e) {
+                    $this->log($e);
+                }
+
                 break;
         }
         return true;
     }
 
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
     private function refreshSingleDataFiles() {
-        //todo: not implemented yet
-        echo json_encode([
-            'status' => 'success',
-            'message' => $_REQUEST
-        ]);
+        $directus = new Directus($this->grav, $this->config());
+
+        if( isset($_REQUEST['update']) || isset($_REQUEST['new']) || isset($_REQUEST['delete']))
+        {
+            $requestConfig = json_decode($_REQUEST[key($_REQUEST)], true);
+            foreach ($this->grav['pages']->instances() as $pageObject) {
+                if(isset($pageObject->header()->directus)) {
+                    $directusConfig = $pageObject->header()->directus;
+                    if($directusConfig['collection'] === $requestConfig['table']) {
+                        if (isset($directusConfig['id']))
+                        {
+                            if ((int)$directusConfig['id'] === (int)$requestConfig['id']) {
+                                $directus->crawlPage($pageObject);
+                            } else {
+                                return;
+                            }
+                        } elseif (!isset($directusConfig['id']) && !isset($directusConfig['filter'])) {
+                            $directus->crawlPage($pageObject);
+                        } elseif (isset($directusConfig['filter'])) {
+                            $directus->crawlPage($pageObject);
+                        } else {
+                            return;
+                        }
+                    }
+
+                }
+            }
+        }
         exit;
+    }
+
+    protected function log($data) {
+        $fp = fopen('logs/directus.log', 'w');
+        fwrite($fp, $data);
+        fclose($fp);
     }
 }

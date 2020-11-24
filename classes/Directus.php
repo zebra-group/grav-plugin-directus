@@ -62,19 +62,33 @@ class Directus {
                 isset($requestConfig['id']) ? $requestConfig['id'] : 0,
                 isset($requestConfig['depth']) ? $requestConfig['depth'] : 2,
                 isset($requestConfig['filter']) ? $requestConfig['filter'] : [],
-                isset($requestConfig['limit']) ? $requestConfig['limit'] : -1,
+                isset($requestConfig['limit']) ? $requestConfig['limit'] : 200,
                 isset($requestConfig['sort']) ? $requestConfig['sort'] : ''
             );
             try {
                 /** @var ResponseInterface $response */
                 $response = $this->directusUtil->get($requestUrl);
-                $this->writeFileToFileSystem($response->toArray(), $page->path());
+                if(count($response->toArray()['data']) <= 0) {
+                    $this->deleteFromFileSystem($page->path());
+                } else {
+                    $this->writeFileToFileSystem($response->toArray(), $page->path());
+                }
+
                 return true;
             } catch (\Exception $e) {
                 $this->grav['debugger']->addException($e);
             }
         }
         return false;
+    }
+
+    /**
+     * @param string $path
+     * @param string $filename
+     * @return bool
+     */
+    private function deleteFromFileSystem(string $path, string $filename = 'data.json') {
+        return unlink ($path . '/' . $filename);
     }
 
     /**
@@ -146,5 +160,11 @@ class Directus {
         }
         $this->grav['debugger']->addMessage('Directus: no data.json');
         return null;
+    }
+
+    protected function log($data) {
+        $fp = fopen('logs/directus.log', 'w');
+        fwrite($fp, $data);
+        fclose($fp);
     }
 }
