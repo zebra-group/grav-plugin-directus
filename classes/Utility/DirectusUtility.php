@@ -2,7 +2,8 @@
 namespace Grav\Plugin\Directus\Utility;
 
 
-use Symfony\Component\HttpClient\HttpClient;
+use Grav\Common\Grav;
+use Symfony\Component\HttpClient\CurlHttpClient;
 
 /**
  * Class DirectusUtility
@@ -11,7 +12,7 @@ use Symfony\Component\HttpClient\HttpClient;
 class DirectusUtility
 {
     /**
-     * @var \Symfony\Contracts\HttpClient\HttpClientInterface
+     * @var \Symfony\Component\HttpClient\CurlHttpClient
      */
     private $httpClient;
 
@@ -36,9 +37,15 @@ class DirectusUtility
     private $token;
 
     /**
+     * @var Grav
+     */
+    private $grav;
+
+    /**
      * DirectusUtility constructor.
      * @param string $apiUrl
      * @param string $projectName
+     * @param Grav $grav
      * @param string $email
      * @param string $password
      * @param string $token
@@ -47,13 +54,14 @@ class DirectusUtility
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function __construct(string $apiUrl, string $projectName, string $email = '', string $password = '', string $token = '')
+    public function __construct(string $apiUrl, string $projectName, Grav $grav, string $email = '', string $password = '', string $token = '')
     {
-        $this->httpClient = HttpClient::create();
+        $this->httpClient = new CurlHttpClient();
         $this->apiServer = $apiUrl . '/' . $projectName;
         $this->email = $email;
         $this->password = $password;
         $this->token = $token ? $token : $this->requestToken();
+        $this->grav = $grav;
     }
 
     /**
@@ -100,6 +108,12 @@ class DirectusUtility
         $options = [
             'headers' => $this->getAuthorizationHeaders()
         ];
+
+        if ( $this->grav['debugger']->enabled() )
+        {
+            $options['verify_peer'] = false;
+            $options['verify_host'] = false;
+        }
 
         return $this->httpClient->request(
             'GET',
