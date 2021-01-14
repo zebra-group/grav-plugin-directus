@@ -46,7 +46,6 @@ directus:
   email: your@email.com
   password: supersavepassword
   directusAPIUrl: http://your.api.com
-  projectName: project-name
   hookPrefix: your-prefix
 ```
 
@@ -64,7 +63,7 @@ directus:
     id: 12
     filter:
         field_name:
-            operator: eq
+            operator: _eq
             value: filter_value
         ...
     limit: 6
@@ -91,7 +90,7 @@ directus:
     collection: users
     filter:
         full_name:
-            operator: eq
+            operator: _eq
             value: John Doe
         birth_date:
             operator: not

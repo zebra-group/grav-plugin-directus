@@ -54,10 +54,10 @@ class DirectusUtility
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function __construct(string $apiUrl, string $projectName, Grav $grav, string $email = '', string $password = '', string $token = '')
+    public function __construct(string $apiUrl, Grav $grav, string $email = '', string $password = '', string $token = '')
     {
         $this->httpClient = new CurlHttpClient();
-        $this->apiServer = $apiUrl . '/' . $projectName;
+        $this->apiServer = $apiUrl;
         $this->email = $email;
         $this->password = $password;
         $this->token = $token ? $token : $this->requestToken();
@@ -94,7 +94,7 @@ class DirectusUtility
      */
     private function getAuthorizationHeaders() {
         return [
-            'Authorization' => 'bearer ' . $this->token
+            'Authorization' => 'Bearer ' . $this->token
         ];
     }
 

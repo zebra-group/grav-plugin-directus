@@ -38,7 +38,6 @@ class Directus {
         $this->config = $config;
         $this->directusUtil = new DirectusUtility(
             $this->config['directus']['directusAPIUrl'],
-            $this->config['directus']['projectName'],
             $this->grav,
             $this->config['directus']['email'],
             $this->config['directus']['password'],

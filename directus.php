@@ -92,6 +92,7 @@ class DirectusPlugin extends Plugin
         $directus = new Directus($this->grav, $this->config());
 
         foreach($this->grav['pages']->instances() as $pageObject) {
+
             $directus->crawlPage($pageObject);
         }
         header('Content-Type: application/json');

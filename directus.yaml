@@ -4,5 +4,4 @@ directus:
   email: your@email.com
   password: supersavepassword
   directusAPIUrl: http://your.api.com
-  projectName: project-name
   hookPrefix: your-prefix
