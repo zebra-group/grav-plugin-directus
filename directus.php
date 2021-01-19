@@ -97,7 +97,7 @@ class DirectusPlugin extends Plugin
         $contentFolder = $this->grav['page']->path() . '/assets';
 
         $directusUtil = new DirectusUtility(
-            (isset($this->config()['imageServer']) ? $this->config()['imageServer'] : $this->config()['directus']['directusAPIUrl']),
+            ((isset($this->config()['imageServer']) && $this->config()['imageServer']) ? $this->config()['imageServer'] : $this->config()['directus']['directusAPIUrl']),
             $this->grav,
             $this->config()['directus']['email'],
             $this->config()['directus']['password'],
