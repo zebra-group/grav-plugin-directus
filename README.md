@@ -93,7 +93,7 @@ directus:
             operator: _eq
             value: John Doe
         birth_date:
-            operator: not
+            operator: _not
             value: 1984
 ---
 ```
