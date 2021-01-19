@@ -4,6 +4,8 @@ namespace Grav\Plugin;
 use Composer\Autoload\ClassLoader;
 use Grav\Common\Plugin;
 use Grav\Plugin\Directus\Directus;
+use Grav\Plugin\Directus\Utility\DirectusUtility;
+use RocketTheme\Toolbox\Event\Event;
 
 /**
  * Class DirectusPlugin
@@ -55,7 +57,8 @@ class DirectusPlugin extends Plugin
         // Enable the main events we are interested in
         $this->enable([
             'onPageInitialized' => ['onPageInitialized', 0],
-            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+            'onTwigInitialized' => ['onTwigInitialized', 0]
         ]);
     }
 
@@ -70,6 +73,68 @@ class DirectusPlugin extends Plugin
     {
 
         $this->processWebHooks($this->grav['uri']->route());
+    }
+
+    /**
+     * @param Event $e
+     */
+    public function onTwigInitialized(Event $e) {
+        $this->grav['twig']->twig()->addFunction(
+            new \Twig_SimpleFunction('directusFile', [$this, 'returnDirectusFile'])
+        );
+    }
+
+    /**
+     * @param array|null $fileReference
+     * @param array|null $options
+     * @return string
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function returnDirectusFile (?array $fileReference, ?array $options = []) {
+        $contentFolder = $this->grav['page']->path() . '/assets';
+
+        $directusUtil = new DirectusUtility(
+            (isset($this->config()['imageServer']) ? $this->config()['imageServer'] : $this->config()['directus']['directusAPIUrl']),
+            $this->grav,
+            $this->config()['directus']['email'],
+            $this->config()['directus']['password'],
+            $this->config()['directus']['token']
+        );
+
+        if (!is_dir($contentFolder)) {
+            mkdir ($contentFolder);
+        }
+
+        $url =  '/assets/' . $fileReference['id'];
+        $fileName = $contentFolder . '/' . $fileReference['filename_download'];
+
+        $c = 0;
+
+        foreach ($options as $key => $value) {
+            if($c === 0) {
+                $url .= '?' . $key . '=' . $value;
+            } else {
+                $url .= '&' . $key . '=' . $value;
+            }
+            $c++;
+        }
+
+        if (!file_exists($fileName)) {
+            try {
+                $imageData = $directusUtil->get($url)->getContent();
+
+                $fp = fopen($fileName,'x');
+                fwrite($fp, $imageData);
+                fclose($fp);
+            } catch (\Exception $e) {
+                $this->grav['debugger']->addException($e);
+            }
+        }
+
+        return $this->grav['page']->relativePagePath() . '/assets/' . $fileReference['filename_download'];
     }
 
     /**
@@ -89,7 +154,7 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     private function refreshGlobalDataFiles() {
-        $directus = new Directus($this->grav, $this->config());
+        $directus = $this->initializeDirectusLib();
 
         foreach($this->grav['pages']->instances() as $pageObject) {
 
@@ -101,6 +166,13 @@ class DirectusPlugin extends Plugin
             'message' => 'Global import completed'
         ]);
         exit;
+    }
+
+    /**
+     * @return Directus
+     */
+    private function initializeDirectusLib() {
+        return new Directus($this->grav, $this->config());
     }
 
     /**
