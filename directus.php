@@ -101,7 +101,8 @@ class DirectusPlugin extends Plugin
             $this->grav,
             $this->config()['directus']['email'],
             $this->config()['directus']['password'],
-            $this->config()['directus']['token']
+            $this->config()['directus']['token'],
+            isset($this->config['disableCors']) && $this->config['disableCors']
         );
 
         if (!is_dir($contentFolder)) {
@@ -109,7 +110,14 @@ class DirectusPlugin extends Plugin
         }
 
         $url =  '/assets/' . $fileReference['id'];
-        $fileName = $contentFolder . '/' . $fileReference['filename_download'];
+
+        $hash = md5(json_encode($options));
+        $path_parts = pathinfo($fileReference['filename_download']);
+
+        $physicalPath = $contentFolder . '/';
+        $fileName = $path_parts['filename'] . '-' . $hash . '.' . $path_parts['extension'];
+
+        $fullPath = $physicalPath . $fileName;
 
         $c = 0;
 
@@ -122,11 +130,11 @@ class DirectusPlugin extends Plugin
             $c++;
         }
 
-        if (!file_exists($fileName)) {
+        if (!file_exists($fullPath)) {
             try {
                 $imageData = $directusUtil->get($url)->getContent();
 
-                $fp = fopen($fileName,'x');
+                $fp = fopen($fullPath,'x');
                 fwrite($fp, $imageData);
                 fclose($fp);
             } catch (\Exception $e) {
@@ -134,7 +142,7 @@ class DirectusPlugin extends Plugin
             }
         }
 
-        return '/' . $this->grav['page']->relativePagePath() . '/assets/' . $fileReference['filename_download'];
+        return '/' . $this->grav['page']->relativePagePath() . '/assets/' . $fileName;
     }
 
     /**
