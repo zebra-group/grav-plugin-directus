@@ -42,7 +42,7 @@ Note that if you use the Admin Plugin, a file with your configuration named dire
 ```yaml
 imageServer: false
 ```
-not implemented yet
+partially implemented - placeholder only yet
 
 ```yaml
 disableCors: true
