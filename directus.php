@@ -134,7 +134,7 @@ class DirectusPlugin extends Plugin
             }
         }
 
-        return $this->grav['page']->relativePagePath() . '/assets/' . $fileReference['filename_download'];
+        return '/' . $this->grav['page']->relativePagePath() . '/assets/' . $fileReference['filename_download'];
     }
 
     /**
@@ -153,7 +153,7 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    private function refreshGlobalDataFiles() {
+    public function refreshGlobalDataFiles() {
         $directus = $this->initializeDirectusLib();
 
         foreach($this->grav['pages']->instances() as $pageObject) {
