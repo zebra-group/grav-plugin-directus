@@ -94,55 +94,61 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function returnDirectusFile (?array $fileReference, ?array $options = []) {
-        $contentFolder = $this->grav['page']->path() . '/assets';
+        if(gettype($fileReference) === 'array') {
+            $contentFolder = $this->grav['page']->path() . '/assets';
 
-        $directusUtil = new DirectusUtility(
-            ((isset($this->config()['imageServer']) && $this->config()['imageServer']) ? $this->config()['imageServer'] : $this->config()['directus']['directusAPIUrl']),
-            $this->grav,
-            $this->config()['directus']['email'],
-            $this->config()['directus']['password'],
-            $this->config()['directus']['token'],
-            isset($this->config['disableCors']) && $this->config['disableCors']
-        );
+            $directusUtil = new DirectusUtility(
+                ((isset($this->config()['imageServer']) && $this->config()['imageServer']) ? $this->config()['imageServer'] : $this->config()['directus']['directusAPIUrl']),
+                $this->grav,
+                $this->config()['directus']['email'],
+                $this->config()['directus']['password'],
+                $this->config()['directus']['token'],
+                isset($this->config['disableCors']) && $this->config['disableCors']
+            );
 
-        if (!is_dir($contentFolder)) {
-            mkdir ($contentFolder);
-        }
-
-        $url =  '/assets/' . $fileReference['id'];
-
-        $hash = md5(json_encode($options));
-        $path_parts = pathinfo($fileReference['filename_download']);
-
-        $physicalPath = $contentFolder . '/';
-        $fileName = $path_parts['filename'] . '-' . $hash . '.' . $path_parts['extension'];
-
-        $fullPath = $physicalPath . $fileName;
-
-        $c = 0;
-
-        foreach ($options as $key => $value) {
-            if($c === 0) {
-                $url .= '?' . $key . '=' . $value;
-            } else {
-                $url .= '&' . $key . '=' . $value;
+            if (!is_dir($contentFolder)) {
+                mkdir ($contentFolder);
             }
-            $c++;
-        }
 
-        if (!file_exists($fullPath)) {
-            try {
-                $imageData = $directusUtil->get($url)->getContent();
+            $url =  '/assets/' . $fileReference['id'];
 
-                $fp = fopen($fullPath,'x');
-                fwrite($fp, $imageData);
-                fclose($fp);
-            } catch (\Exception $e) {
-                $this->grav['debugger']->addException($e);
+            $hash = md5(json_encode($options));
+            $path_parts = pathinfo($fileReference['filename_download']);
+            if(!isset($path_parts['extension'])) {
+                dd($fileReference);
             }
-        }
+            $physicalPath = $contentFolder . '/';
+            $fileName = $path_parts['filename'] . '-' . $hash . '.' . $path_parts['extension'];
 
-        return '/' . $this->grav['page']->relativePagePath() . '/assets/' . $fileName;
+            $fullPath = $physicalPath . $fileName;
+
+            $c = 0;
+
+            foreach ($options as $key => $value) {
+                if($c === 0) {
+                    $url .= '?' . $key . '=' . $value;
+                } else {
+                    $url .= '&' . $key . '=' . $value;
+                }
+                $c++;
+            }
+
+            if (!file_exists($fullPath)) {
+                try {
+                    $imageData = $directusUtil->get($url)->getContent();
+
+                    $fp = fopen($fullPath,'x');
+                    fwrite($fp, $imageData);
+                    fclose($fp);
+                } catch (\Exception $e) {
+                    $this->grav['debugger']->addException($e);
+                }
+            }
+
+            return '/' . $this->grav['page']->relativePagePath() . '/assets/' . $fileName;
+        } else {
+            return null;
+        }
     }
 
     /**
