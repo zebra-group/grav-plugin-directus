@@ -42,19 +42,24 @@ class DirectusUtility
     private $grav;
 
     /**
+     * @var boolean
+     */
+    private $noCors;
+
+    /**
      * DirectusUtility constructor.
      * @param string $apiUrl
-     * @param string $projectName
      * @param Grav $grav
      * @param string $email
      * @param string $password
      * @param string $token
+     * @param bool $noCors
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function __construct(string $apiUrl, Grav $grav, string $email = '', string $password = '', string $token = '')
+    public function __construct(string $apiUrl, Grav $grav, string $email = '', string $password = '', string $token = '', bool $noCors = false)
     {
         $this->httpClient = new CurlHttpClient();
         $this->apiServer = $apiUrl;
@@ -62,6 +67,7 @@ class DirectusUtility
         $this->password = $password;
         $this->token = $token ? $token : $this->requestToken();
         $this->grav = $grav;
+        $this->noCors = $noCors;
     }
 
     /**
@@ -109,7 +115,7 @@ class DirectusUtility
             'headers' => $this->getAuthorizationHeaders()
         ];
 
-        if ( $this->grav['debugger']->enabled() )
+        if ( $this->grav['debugger']->enabled() || $this->noCors )
         {
             $options['verify_peer'] = false;
             $options['verify_host'] = false;

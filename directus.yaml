@@ -1,5 +1,6 @@
 enabled: true
 imageServer: http://your.image-server.com
+disableCors: true
 directus:
   token: 1234567
   email: your@email.com

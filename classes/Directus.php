@@ -41,7 +41,8 @@ class Directus {
             $this->grav,
             $this->config['directus']['email'],
             $this->config['directus']['password'],
-            $this->config['directus']['token']
+            $this->config['directus']['token'],
+            isset($this->config['disableCors']) && $this->config['disableCors']
         );
     }
 
