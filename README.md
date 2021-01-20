@@ -119,9 +119,5 @@ The sort parameter defines, which field is used for the response array sorting. 
 ```md
 <img src="{{ directusFile(image, {width: 570, height: 620}) }}" loading="lazy" />
 ```
-Directus 9 uses the assets endpoint for requesting files only. The twig Tag downloads the image, if it does not exist, and returns the relative url to the file. The first parameter is the UUID of the file reference and the second parameter is an array with you image manipulation parameters. For a complete parameter list, look here: https://docs.directus.io/reference/api/assets.html
-
-## To Do
-
-- [flexible Webhooks] - this features is planned for the near future. With flexible webhooks it will be possible to refresh single pages per remote request.
+Directus 9 uses the assets endpoint for requesting files only. The twig Tag downloads the image, if it does not exist, and returns the relative url to the file. The first parameter is the file reference from directus api and the second parameter is an array with you image manipulation parameters. For a complete parameter list, look here: https://docs.directus.io/reference/api/assets.html
 
