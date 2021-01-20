@@ -40,7 +40,7 @@ enabled: true
 Note that if you use the Admin Plugin, a file with your configuration named directus.yaml will be saved in the `user/config/plugins/`-folder once the configuration is saved in the Admin.
 
 ```yaml
-imageSerer: false
+imageServer: false
 ```
 not implemented yet
 
