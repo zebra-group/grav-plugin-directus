@@ -1,5 +1,5 @@
 enabled: true
-imageServer: http://your.image-server.com
+imageServer: false
 disableCors: true
 directus:
   token: 1234567
