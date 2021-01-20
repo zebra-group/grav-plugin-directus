@@ -47,7 +47,7 @@ not implemented yet
 ```yaml
 disableCors: true
 ```
-with this setting, the check for ssl on directus api can be disabled oder enabled. By default CORS is disabled.
+with this setting, the check for ssl on directus api can be disabled or enabled. By default CORS is disabled.
 
 ```yaml
 directus:
