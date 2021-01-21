@@ -94,8 +94,6 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function returnDirectusFile (?array $fileReference, ?array $options = []) {
-        $this->grav['debugger']->addMessage($this->grav['config']->get('plugins.directus'));
-
         if(gettype($fileReference) === 'array') {
             $contentFolder = $this->grav['page']->path() . '/' . $this->config()['assetsFolderName'];
 

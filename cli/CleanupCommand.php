@@ -5,7 +5,6 @@ use Grav\Common\Grav;
 use Grav\Console\ConsoleCommand;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class HelloCommand
