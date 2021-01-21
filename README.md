@@ -115,9 +115,10 @@ This is self explaining. This limits the amount of json array items to given lim
 #### sort
 The sort parameter defines, which field is used for the response array sorting. More options here: https://docs.directus.io/api/query/sort.html
 
-## Twig Tags
+## Misc Twig Tags
 ```md
 <img src="{{ directusFile(image, {width: 570, height: 620}) }}" loading="lazy" />
 ```
-Directus 9 uses the assets endpoint for requesting files only. The twig Tag downloads the image, if it does not exist, and returns the relative url to the file. The first parameter is the file reference from directus api and the second parameter is an array with you image manipulation parameters. For a complete parameter list, look here: https://docs.directus.io/reference/api/assets.html
 
+Directus 9 uses the assets endpoint for requesting files only. The twig Tag downloads the file, if it does not exist, and returns the relative url to the file. The first parameter is the file reference object from directus' API. The file will be downloaded to the folder defined in the plugin configuration under ``assetsFolderName`` which defaults to ``assets``. Please add this name to ``pages.ignore_folders`` in your system.yaml.
+The second parameter is an array with you image manipulation parameters. For a complete parameter list, look here: https://docs.directus.io/reference/api/assets.html

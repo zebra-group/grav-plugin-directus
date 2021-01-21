@@ -1,12 +1,12 @@
 name: Directus
 slug: directus
 type: plugin
-version: 0.1.0
+version: 0.5.0
 description: a directus api plugin
 icon: plug
 author:
   name: Erik Konrad
-  email: e_konrad84@yahoo.de
+  email: erik.konrad@zebra.de
 homepage: https://github.com/erik-konrad/grav-plugin-directus
 keywords: grav, plugin, etc
 bugs: https://github.com/erik-konrad/grav-plugin-directus/issues
@@ -29,6 +29,19 @@ form:
         0: PLUGIN_ADMIN.DISABLED
       validate:
         type: bool
+    disableCors:
+      type: toggle
+      label: Disable CORS Checks
+      highlight: 1
+      default: 0
+      options:
+        1: CORS Checks off
+        0: CORS Checks on
+      validate:
+        type: bool
+    assetsFolderName:
+      type: text
+      label: Assets Folder Name
     directus.directusAPIUrl:
       type: text
       label: Directus API URL

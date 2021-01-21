@@ -94,8 +94,10 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function returnDirectusFile (?array $fileReference, ?array $options = []) {
+        $this->grav['debugger']->addMessage($this->grav['config']->get('plugins.directus'));
+
         if(gettype($fileReference) === 'array') {
-            $contentFolder = $this->grav['page']->path() . '/assets';
+            $contentFolder = $this->grav['page']->path() . '/' . $this->config()['assetsFolderName'];
 
             $directusUtil = new DirectusUtility(
                 ((isset($this->config()['imageServer']) && $this->config()['imageServer']) ? $this->config()['imageServer'] : $this->config()['directus']['directusAPIUrl']),
@@ -145,7 +147,7 @@ class DirectusPlugin extends Plugin
                 }
             }
 
-            return '/' . $this->grav['page']->relativePagePath() . '/assets/' . $fileName;
+            return '/' . $this->grav['page']->relativePagePath() . '/' . $this->config()['assetsFolderName'] . '/' . $fileName;
         } else {
             return null;
         }

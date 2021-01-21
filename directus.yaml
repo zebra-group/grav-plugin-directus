@@ -1,6 +1,7 @@
 enabled: true
 imageServer: false
 disableCors: true
+assetsFolderName: assets
 directus:
   token: 1234567
   email: your@email.com
