@@ -5,6 +5,7 @@ use Grav\Common\Grav;
 use Grav\Console\ConsoleCommand;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Class HelloCommand
@@ -27,6 +28,18 @@ class CleanupCommand extends ConsoleCommand
             ->setName("cleanup")
             ->setDescription("Deletes all assets and data.json from page tree")
             ->setHelp('Deletes all assets and data.json from page tree')
+            ->addOption(
+                'json',
+                'j',
+                InputOption::VALUE_NONE,
+                'delete data.json files only'
+            )
+            ->addOption(
+                'assets',
+                'a',
+                InputOption::VALUE_NONE,
+                'delete assets folders and its content only'
+            )
         ;
     }
 
@@ -39,6 +52,12 @@ class CleanupCommand extends ConsoleCommand
         if (method_exists($this, 'initializeGrav')) {
             $this->initializeThemes();
         }
+
+        $this->options = [
+            'json' => $this->input->getOption('json'),
+            'assets' => $this->input->getOption('assets')
+        ];
+
         $grav = Grav::instance();
         $config = $grav['config']->get('plugins.directus');
 
@@ -49,12 +68,16 @@ class CleanupCommand extends ConsoleCommand
         );
         foreach ($files as $fileinfo) {
             if($fileinfo->isDir() && $fileinfo->getFilename() === $config['assetsFolderName']) {
-                dump ('deleted: ' . $fileinfo->getRealPath());
-                $this->deleteRecursive($fileinfo->getRealPath());
-                rmdir($fileinfo->getRealPath());
+                if($this->options['assets'] || (!$this->options['assets'] && !$this->options['json'])) {
+                    dump ('deleted: ' . $fileinfo->getRealPath());
+                    $this->deleteRecursive($fileinfo->getRealPath());
+                    rmdir($fileinfo->getRealPath());
+                }
             } elseif ($fileinfo->isFile() && $fileinfo->getFilename() === 'data.json') {
-                dump ('deleted: ' . $fileinfo->getRealPath());
-                unlink($fileinfo->getRealPath());
+                if($this->options['json'] || (!$this->options['assets'] && !$this->options['json'])) {
+                    dump ('deleted: ' . $fileinfo->getRealPath());
+                    unlink($fileinfo->getRealPath());
+                }
             }
         }
     }
