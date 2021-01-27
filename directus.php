@@ -224,16 +224,16 @@ class DirectusPlugin extends Plugin
      */
     private function refreshSingleDataFiles() {
         $directus = new Directus($this->grav, $this->config());
-        if( isset($_REQUEST['update']) || isset($_REQUEST['new']) || isset($_REQUEST['delete']))
+        if( isset($_REQUEST['action']) && $_REQUEST['action'] === 'update')
         {
-            $requestConfig = json_decode($_REQUEST[key($_REQUEST)], true);
+            $this->log('condition true');
             foreach ($this->grav['pages']->instances() as $pageObject) {
                 if(isset($pageObject->header()->directus)) {
                     $directusConfig = $pageObject->header()->directus;
-                    if($directusConfig['collection'] === $requestConfig['table']) {
+                    if($directusConfig['collection'] === $_REQUEST['table']) {
                         if (isset($directusConfig['id']))
                         {
-                            if ((int)$directusConfig['id'] === (int)$requestConfig['id']) {
+                            if ((int)$directusConfig['id'] === (int)$_REQUEST['id']) {
                                 $directus->crawlPage($pageObject);
                             } else {
                                 continue;
