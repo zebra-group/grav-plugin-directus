@@ -226,7 +226,6 @@ class DirectusPlugin extends Plugin
         $directus = new Directus($this->grav, $this->config());
         if( isset($_REQUEST['action']) && $_REQUEST['action'] === 'update')
         {
-            $this->log('condition true');
             foreach ($this->grav['pages']->instances() as $pageObject) {
                 if(isset($pageObject->header()->directus)) {
                     $directusConfig = $pageObject->header()->directus;
