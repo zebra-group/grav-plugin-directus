@@ -122,3 +122,29 @@ The sort parameter defines, which field is used for the response array sorting. 
 
 Directus 9 uses the assets endpoint for requesting files only. The twig Tag downloads the file, if it does not exist, and returns the relative url to the file. The first parameter is the file reference object from directus' API. The file will be downloaded to the folder defined in the plugin configuration under ``assetsFolderName`` which defaults to ``assets``. Please add this name to ``pages.ignore_folders`` in your system.yaml.
 The second parameter is an array with you image manipulation parameters. For a complete parameter list, look here: https://docs.directus.io/reference/api/assets.html
+
+## CLI commands
+
+### bin/plugin directus cleanup
+
+```md
+Description:
+Deletes all assets and data.json from page tree
+
+Usage:
+cleanup [options]
+
+Options:
+-j, --json            delete data.json files only
+-a, --assets          delete assets folders and its content only
+-h, --help            Display this help message
+-q, --quiet           Do not output any message
+-V, --version         Display this application version
+--ansi            Force ANSI output
+--no-ansi         Disable ANSI output
+-n, --no-interaction  Do not ask any interactive question
+--env[=ENV]       Use environment configuration (defaults to localhost)
+--lang[=LANG]     Language to be used (defaults to en)
+-v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+```
