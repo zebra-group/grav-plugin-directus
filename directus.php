@@ -229,7 +229,7 @@ class DirectusPlugin extends Plugin
             foreach ($this->grav['pages']->instances() as $pageObject) {
                 if(isset($pageObject->header()->directus)) {
                     $directusConfig = $pageObject->header()->directus;
-                    if($directusConfig['collection'] === $_REQUEST['table']) {
+                    if(isset($directusConfig['collection']) && $directusConfig['collection'] === $_REQUEST['table']) {
                         if (isset($directusConfig['id']))
                         {
                             if ((int)$directusConfig['id'] === (int)$_REQUEST['id']) {
