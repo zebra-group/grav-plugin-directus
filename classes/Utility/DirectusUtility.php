@@ -111,6 +111,28 @@ class DirectusUtility
      */
     public function get($path = '')
     {
+
+        $options = $this->getOptions();
+
+        return $this->httpClient->request(
+            'GET',
+            $this->apiServer . $path,
+            $options
+        );
+    }
+
+    public function update(string $collection, int $id,  array $dataSet) {
+        $options = $this->getOptions();
+
+        $options['json'] = $dataSet;
+        return $this->httpClient->request(
+            'PATCH',
+            $this->apiServer . '/items/' . $collection . '/' . $id,
+            $options
+        );
+    }
+
+    private function getOptions() {
         $options = [
             'headers' => $this->getAuthorizationHeaders()
         ];
@@ -121,11 +143,7 @@ class DirectusUtility
             $options['verify_host'] = false;
         }
 
-        return $this->httpClient->request(
-            'GET',
-            $this->apiServer . $path,
-            $options
-        );
+        return $options;
     }
 
     /**
