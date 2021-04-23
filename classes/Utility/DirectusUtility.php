@@ -168,6 +168,16 @@ class DirectusUtility
                 $i < $depth ? $url .= '.' : null;
             }
         }
+        if(isset($filters['status'])) {
+            if(isset($this->grav['config']['system']['env']['state']) && $this->grav['config']['system']['env']['state'] === 'preview') {
+                $filters['status']['operator'] = '_in';
+                $filters['status']['value'] = $this->grav['plugins']['Grav\Plugin\DirectusPlugin']->config()['env']['status']['preview'];
+            } else {
+                $filters['status']['operator'] = '_eq';
+                $filters['status']['value'] = $this->grav['plugins']['Grav\Plugin\DirectusPlugin']->config()['env']['status']['default'];
+            }
+        }
+
         foreach($filters as $field => $filter) {
             $url .= '&filter[' . $field . ']' . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
         }
@@ -175,7 +185,6 @@ class DirectusUtility
         if($sort) {
             $url .= '&sort=' . $sort;
         }
-
 
         return $url;
     }
