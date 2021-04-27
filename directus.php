@@ -82,6 +82,20 @@ class DirectusPlugin extends Plugin
         $this->grav['twig']->twig()->addFunction(
             new \Twig_SimpleFunction('directusFile', [$this, 'returnDirectusFile'])
         );
+        $this->grav['twig']->twig()->addFunction(
+            new \Twig_SimpleFunction('localize', [$this, 'localizeObject'])
+        );
+    }
+
+    /**
+     * @param array $object
+     * @param string $lang
+     * @return array
+     */
+    public function localizeObject(array $object, string $lang) {
+        $directus = new Directus($this->grav, $this->config());
+        return $directus->remapLanguageToArray($object, $lang);
+
     }
 
     /**
