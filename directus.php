@@ -2,6 +2,7 @@
 namespace Grav\Plugin;
 
 use Composer\Autoload\ClassLoader;
+use Grav\Common\Cache;
 use Grav\Common\Plugin;
 use Grav\Plugin\Directus\Directus;
 use Grav\Plugin\Directus\Utility\DirectusUtility;
@@ -193,6 +194,8 @@ class DirectusPlugin extends Plugin
             'status' => 'success',
             'message' => 'Global import completed'
         ]);
+
+        Cache::clearCache();
         exit;
     }
 
