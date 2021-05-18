@@ -1,6 +1,6 @@
 # Directus Plugin
 
-The **Directus** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). a directus api plugin
+The **Directus** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). a directus api plugin 1
 
 ## Installation
 
