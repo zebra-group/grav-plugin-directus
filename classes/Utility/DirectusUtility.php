@@ -179,7 +179,7 @@ class DirectusUtility
         }
 
         foreach($filters as $field => $filter) {
-            $url .= '&filter[' . $field . ']' . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
+            $url .= '&filter[' . $field . ']' . (isset($filter['mm_field']) ? '[' . $filter['mm_field'] . ']' : '') . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
         }
         $url .= '&limit=' . (string)$limit;
         if($sort) {
