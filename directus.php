@@ -2,6 +2,7 @@
 namespace Grav\Plugin;
 
 use Composer\Autoload\ClassLoader;
+use Grav\Common\Cache;
 use Grav\Common\Plugin;
 use Grav\Plugin\Directus\Directus;
 use Grav\Plugin\Directus\Utility\DirectusUtility;
@@ -82,6 +83,20 @@ class DirectusPlugin extends Plugin
         $this->grav['twig']->twig()->addFunction(
             new \Twig_SimpleFunction('directusFile', [$this, 'returnDirectusFile'])
         );
+        $this->grav['twig']->twig()->addFunction(
+            new \Twig_SimpleFunction('localize', [$this, 'localizeObject'])
+        );
+    }
+
+    /**
+     * @param array $object
+     * @param string $lang
+     * @return array
+     */
+    public function localizeObject(array $object, string $lang) {
+        $directus = new Directus($this->grav, $this->config());
+        return $directus->remapLanguageToArray($object, $lang);
+
     }
 
     /**
@@ -179,6 +194,8 @@ class DirectusPlugin extends Plugin
             'status' => 'success',
             'message' => 'Global import completed'
         ]);
+
+        Cache::clearCache();
         exit;
     }
 

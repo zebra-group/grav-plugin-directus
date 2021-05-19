@@ -140,6 +140,7 @@ class Directus {
 
     /**
      * @param Page $page
+     * @param string $lang
      * @return mixed|null
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
@@ -147,8 +148,8 @@ class Directus {
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function get(Page $page) {
-
+    public function get(Page $page, string $lang="") {
+       // dd($lang);
         $directusFile = $page->path() . '/data.json';
         if(!file_exists($directusFile)) {
             $this->crawlPage($page);
@@ -157,10 +158,34 @@ class Directus {
         $result = $this->readFile($page->path());
 
         if($result) {
+            if($lang && isset($result['translations'])) {
+                $result = $this->remapLanguageToArray($result, $lang);
+            }
+
             return $result;
         }
         $this->grav['debugger']->addMessage('Directus: no data.json');
         return null;
+    }
+
+    /**
+     * @param array $object
+     * @param string $lang
+     * @return array
+     */
+    public function remapLanguageToArray(array $object, string $lang) {
+        foreach($object['translations'] as $translation) {
+            if(is_array($translation['languages_code']) && ($lang === substr($translation['languages_code']['code'], 0, 2))) {
+                foreach ($translation as $key => $value) {
+                    $object[$key] = $value;
+                }
+            } elseif (is_string($translation['languages_code']) && ($lang === substr($translation['languages_code'], 0, 2))) {
+                foreach ($translation as $key => $value) {
+                    $object[$key] = $value;
+                }
+            }
+        }
+        return $object;
     }
 
     protected function log($data) {
