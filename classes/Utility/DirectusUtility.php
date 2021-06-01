@@ -96,6 +96,13 @@ class DirectusUtility
     }
 
     /**
+     * @param string $token
+     */
+    public function setToken(string $token){
+        $this->token = $token;
+    }
+
+    /**
      * @return string[]
      */
     private function getAuthorizationHeaders() {
