@@ -159,7 +159,7 @@ class Directus {
 
         if($result) {
             if($lang && isset($result['translations'])) {
-                $result = $this->remapLanguageToArray($result, $lang);
+                $result = $this->translate($result, $lang);
             }
 
             return $result;
@@ -173,7 +173,7 @@ class Directus {
      * @param string $lang
      * @return array
      */
-    public function remapLanguageToArray(array $object, string $lang) {
+    public function translate(array $object, string $lang) {
         foreach($object['translations'] as $translation) {
             if(is_array($translation['languages_code']) && ($lang === substr($translation['languages_code']['code'], 0, 2))) {
                 foreach ($translation as $key => $value) {
