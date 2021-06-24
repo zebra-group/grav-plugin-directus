@@ -96,6 +96,13 @@ class DirectusUtility
     }
 
     /**
+     * @param string $token
+     */
+    public function setToken(string $token){
+        $this->token = $token;
+    }
+
+    /**
      * @return string[]
      */
     private function getAuthorizationHeaders() {
@@ -148,13 +155,13 @@ class DirectusUtility
 
     /**
      * @param string $collection
-     * @param int $id
+     * @param string $id
      * @param int $depth
      * @param array $filters
      * @param int $limit
      * @return string
      */
-    public function generateRequestUrl(string $collection, int $id = 0, int $depth = 2, array $filters = [], int $limit = -1, string $sort = '') {
+    public function generateRequestUrl(string $collection, string $id = '0', int $depth = 2, array $filters = [], int $limit = -1, string $sort = '') {
         $url = '/items/' . $collection . ($id ? '/' : null);
 
         if($id) {
@@ -179,7 +186,7 @@ class DirectusUtility
         }
 
         foreach($filters as $field => $filter) {
-            $url .= '&filter[' . $field . ']' . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
+            $url .= '&filter[' . $field . ']' . (isset($filter['mm_field']) ? '[' . $filter['mm_field'] . ']' : '') . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
         }
         $url .= '&limit=' . (string)$limit;
         if($sort) {

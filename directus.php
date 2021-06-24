@@ -95,7 +95,7 @@ class DirectusPlugin extends Plugin
      */
     public function localizeObject(array $object, string $lang) {
         $directus = new Directus($this->grav, $this->config());
-        return $directus->remapLanguageToArray($object, $lang);
+        return $directus->translate($object, $lang);
 
     }
 
