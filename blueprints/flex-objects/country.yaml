@@ -1,0 +1,12 @@
+title: Country
+description: Country
+type: flex-objects
+config:
+  data:
+    object: 'Grav\Common\Flex\Types\Generic\GenericObject'
+    collection: 'Grav\Common\Flex\Types\Generic\GenericCollection'
+    index: 'Grav\Common\Flex\Types\Generic\GenericIndex'
+    storage:
+      class: 'Grav\Framework\Flex\Storage\FolderStorage'
+      options:
+        folder: user-data://flex-objects/country

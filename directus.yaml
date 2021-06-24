@@ -12,3 +12,8 @@ directus:
   password: supersavepassword
   directusAPIUrl: http://your.api.com
   hookPrefix: your-prefix
+  synchronizeTables:
+    country:
+      depth: 2
+    currency:
+      depth: 2
