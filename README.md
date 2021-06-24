@@ -56,11 +56,26 @@ directus:
   password: supersavepassword
   directusAPIUrl: http://your.api.com
   hookPrefix: your-prefix
+  synchronizeTables:
+      country:
+          depth: 2
+      currency:
+          depth: 2
 ```
 
 In this section, you have to configure the Directus API Access. There are two ways of authentification. The first way is to use a static token. You can find the token in the table with your user credentials on Directus server. Otherwise you have to enter your username and password. This is not neccessary if a security token is given. The plugin will request a temporary authentification token from the API. If a static token is given, the username and password are not used.
 
 The hook prefix is a key for the hook routes. You can change it for security reasons. So, the hooks are accessible under e.g. https://your.site/your-prefix/refresh-global for the global update hook.
+
+## Flex Objects
+Since GRAV 1.7 you can use the Flex-Objects Plugin for Datahandling. The Directus plugins offers to synchronize Directus collections with the flex-objects. For this you have to create flex-object blueprints for your collections. Some simple sample blueprints are in blueprints/flex-objects.
+
+In the next step you have to configure your collection mapping. This is the part in the config under "synchronizeTables". The Key is the table name and the depth is the depth of the directus request.
+
+### Webhook API Endpoints
+http://your.api.com/your-prefix//sync-flexobjects - synchronizes all configured directus collections with the flex-objects
+
+http://your.api.com/your-prefix//sync-flexobject - synchronizes one directus collection entity with flex-objects. For use in Directus Webhook module only.
 ## Usage
 
 ```md
