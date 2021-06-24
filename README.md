@@ -1,6 +1,6 @@
 # Directus Plugin
 
-The **Directus** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). a directus api plugin
+The **Directus** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). a directus api plugin 1
 
 ## Installation
 
@@ -21,7 +21,7 @@ To install the plugin manually, download the zip-version of this repository and 
 You should now have all the plugin files under
 
     /your/site/grav/user/plugins/directus
-	
+
 > NOTE: This plugin is a modular component for Grav which may require other plugins to operate, please see its [blueprints.yaml-file on GitHub](https://github.com//grav-plugin-directus/blob/master/blueprints.yaml).
 
 ### Admin Plugin
@@ -60,7 +60,7 @@ directus:
 
 In this section, you have to configure the Directus API Access. There are two ways of authentification. The first way is to use a static token. You can find the token in the table with your user credentials on Directus server. Otherwise you have to enter your username and password. This is not neccessary if a security token is given. The plugin will request a temporary authentification token from the API. If a static token is given, the username and password are not used.
 
-The hook prefix is a key for the hook routes. You can change it for security reasons. So, the hooks are accessible under e.g. https://your.site/your-prefix/refresh-global for the global update hook. 
+The hook prefix is a key for the hook routes. You can change it for security reasons. So, the hooks are accessible under e.g. https://your.site/your-prefix/refresh-global for the global update hook.
 ## Usage
 
 ```md
@@ -110,10 +110,45 @@ Here is a configuration sample for the filters section. An overview with all pos
 If no operator is set, the default operator is "=".
 
 #### limit
-This is self explaining. This limits the amount of json array items to given limit. default: -1 (all items) 
+This is self explaining. This limits the amount of json array items to given limit. default: -1 (all items)
 
 #### sort
 The sort parameter defines, which field is used for the response array sorting. More options here: https://docs.directus.io/api/query/sort.html
+
+## Translations
+
+When using directus build in translation functionality there is a helper function `directus.translate` for twig:
+
+```twig
+{% set currentLang = grav.language.getActive ?: grav.config.site.default_lang %}
+{% set refData = directus.get( page, currentLang ) %}
+{% set description = directus.translate( refData.related_content_elements[0].related_content_id, currentLang ) %}
+{{description.content_description|markdown|raw }}
+```
+
+We assume the language is defined as two character code like `de` or `en`. `directus.translate` will need the (sub-) object to translate as first parameter and the language code as second. The object must have the directus generated `translations` in the first level. The function returns the orignal object but replaced all fields available in the first level with its translation.
+
+Before:
+```yaml
+object:
+  id: 4
+  content_description: 'english original content'
+  …
+  translations:
+    content_description: 'deutsche Überseztung'
+```
+
+After:
+```yaml
+object:
+  id: 4
+  content_description: 'deutsche Überseztung'
+  …
+  translations:
+    content_description: 'deutsche Überseztung'
+```
+
+When calling `directus.get` with a language as second parameter it will do the same as `directus.translate` with the first level of the data.
 
 ## Misc Twig Tags
 ```md
