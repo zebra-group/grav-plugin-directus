@@ -99,7 +99,6 @@ class DirectusPlugin extends Plugin
      */
     public function onPageInitialized()
     {
-
         /** @var Flex $flex */
         $this->flex = Grav::instance()->get('flex');
 
@@ -138,6 +137,7 @@ class DirectusPlugin extends Plugin
 
     }
 
+
     /**
      * @param array|null $fileReference
      * @param array|null $options
@@ -148,9 +148,12 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function returnDirectusFile (?array $fileReference, ?array $options = []) {
-        if(gettype($fileReference) === 'array') {
-            $contentFolder = $this->grav['page']->path() . '/' . $this->config()['assetsFolderName'];
-
+        if(is_array($fileReference)) {
+            if($this->settings()['centralizedFileStorage'] === false) {
+                $contentFolder = $this->grav['page']->path() . '/' . $this->config()['assetsFolderName'];
+            } else {
+                $contentFolder = 'user/data/' . $this->config()['assetsFolderName'];
+            }
             $directusUtil = new DirectusUtility(
                 ((isset($this->config()['imageServer']) && $this->config()['imageServer']) ? $this->config()['imageServer'] : $this->config()['directus']['directusAPIUrl']),
                 $this->grav,
@@ -199,7 +202,12 @@ class DirectusPlugin extends Plugin
                 }
             }
 
-            return '/' . $this->grav['page']->relativePagePath() . '/' . $this->config()['assetsFolderName'] . '/' . $fileName;
+            if($this->settings()['centralizedFileStorage'] === false) {
+                return '/' . $this->grav['page']->relativePagePath() . '/' . $this->config()['assetsFolderName'] . '/' . $fileName;
+            } else {
+                return 'user/data/' . $this->config()['assetsFolderName'] . '/' . $fileName;
+            }
+
         } else {
             return null;
         }

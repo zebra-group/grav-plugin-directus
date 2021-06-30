@@ -2,6 +2,7 @@ enabled: true
 imageServer: false
 disableCors: true
 assetsFolderName: assets
+centralizedFileStorage: true
 env:
   status:
     default: published
