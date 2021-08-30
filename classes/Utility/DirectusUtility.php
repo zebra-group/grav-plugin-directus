@@ -139,6 +139,17 @@ class DirectusUtility
         );
     }
 
+    public function insert(string $collection,  array $dataSet) {
+        $options = $this->getOptions();
+
+        $options['json'] = $dataSet;
+        return $this->httpClient->request(
+            'POST',
+            $this->apiServer . '/items/' . $collection,
+            $options
+        );
+    }
+
     private function getOptions() {
         $options = [
             'headers' => $this->getAuthorizationHeaders()
