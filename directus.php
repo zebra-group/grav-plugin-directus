@@ -149,7 +149,7 @@ class DirectusPlugin extends Plugin
      */
     public function returnDirectusFile (?array $fileReference, ?array $options = []) {
         if(is_array($fileReference)) {
-            if($this->settings()['centralizedFileStorage'] === false) {
+            if($this->config()['centralizedFileStorage'] === false) {
                 $contentFolder = $this->grav['page']->path() . '/' . $this->config()['assetsFolderName'];
             } else {
                 $contentFolder = 'user/data/' . $this->config()['assetsFolderName'];
@@ -202,10 +202,10 @@ class DirectusPlugin extends Plugin
                 }
             }
 
-            if($this->settings()['centralizedFileStorage'] === false) {
+            if($this->config()['centralizedFileStorage'] === false) {
                 return '/' . $this->grav['page']->relativePagePath() . '/' . $this->config()['assetsFolderName'] . '/' . $fileName;
             } else {
-                return 'user/data/' . $this->config()['assetsFolderName'] . '/' . $fileName;
+                return '/user/data/' . $this->config()['assetsFolderName'] . '/' . $fileName;
             }
 
         } else {

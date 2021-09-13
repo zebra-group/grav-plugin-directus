@@ -177,11 +177,17 @@ class Directus {
         foreach($object['translations'] as $translation) {
             if(is_array($translation['languages_code']) && ($lang === substr($translation['languages_code']['code'], 0, 2))) {
                 foreach ($translation as $key => $value) {
-                    $object[$key] = $value;
+                    if($key !== 'id' && $value)
+                    {
+                        $object[$key] = $value;
+                    }
                 }
             } elseif (is_string($translation['languages_code']) && ($lang === substr($translation['languages_code'], 0, 2))) {
                 foreach ($translation as $key => $value) {
-                    $object[$key] = $value;
+                    if($key !== 'id' && $value)
+                    {
+                        $object[$key] = $value;
+                    }
                 }
             }
         }
