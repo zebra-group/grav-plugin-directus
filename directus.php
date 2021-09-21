@@ -373,7 +373,7 @@ class DirectusPlugin extends Plugin
             $this->collection = $this->flex->getCollection($collection);
             /** @var FlexDirectoryInterface $directory */
             $this->directory = $this->flex->getDirectory($collection);
-            $response = $this->requestItem($collection, 0, ($config['depth'] ?? 2), ($config['filter'] ?: []));
+            $response = $this->requestItem($collection, 0, ($config['depth'] ?? 2), ($config['filter'] ?? []));
             foreach ($response->toArray()['data'] as $item){
                 $object = $this->collection->get($item['id']);
 
