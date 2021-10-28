@@ -124,6 +124,17 @@ directus:
 Here is a configuration sample for the filters section. An overview with all possible operators you can find here: https://docs.directus.io/api/query/filter.html
 If no operator is set, the default operator is "=".
 
+It is possible to filter over deep nested relations. For this you have to define the path as dot separated string.
+
+```md
+directus:
+    collection: users
+    filter:
+        groups.groups_id.address.phone:
+            operator: _eq
+            value: +4955512345
+```
+
 #### limit
 This is self explaining. This limits the amount of json array items to given limit. default: -1 (all items)
 
