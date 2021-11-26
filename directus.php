@@ -302,6 +302,15 @@ class DirectusPlugin extends Plugin
 
         $statusCode = 0;
 
+        if(file_exists('user/data/flex-objects/.lock')) {
+            echo json_encode([
+                'status' => 200,
+                'message' => 'locked'
+            ], JSON_THROW_ON_ERROR);
+            Cache::clearCache();
+            exit(200);
+        }
+
         if(isset($requestBody['collection'])) {
 
             /** @var FlexCollectionInterface $collection */
@@ -362,7 +371,20 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     private function processFlexObjects() {
+
+        if(file_exists('user/data/flex-objects/.lock')) {
+            echo json_encode([
+                'status' => 200,
+                'message' => 'locked'
+            ], JSON_THROW_ON_ERROR);
+            Cache::clearCache();
+            exit(200);
+        }
+
         $this->delTree('user/data/flex-objects');
+
+        touch('user/data/flex-objects/.lock');
+
 
         $collectionArray = $this->config()['directus']['synchronizeTables'];
 
@@ -392,6 +414,7 @@ class DirectusPlugin extends Plugin
             'message' => 'all done'
         ], JSON_THROW_ON_ERROR);
         Cache::clearCache();
+        unlink('user/data/flex-objects/.lock');
         exit(200);
     }
 
