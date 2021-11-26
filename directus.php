@@ -303,12 +303,16 @@ class DirectusPlugin extends Plugin
         $statusCode = 0;
 
         if(file_exists('user/data/flex-objects/.lock')) {
-            echo json_encode([
-                'status' => 200,
-                'message' => 'locked'
-            ], JSON_THROW_ON_ERROR);
-            Cache::clearCache();
-            exit(200);
+            if(time() - filemtime('user/data/flex-objects/.lock') > ($this->config()['lockfileLifetime'] ?? 120)) {
+                unlink('user/data/flex-objects/.lock');
+            } else {
+                echo json_encode([
+                    'status' => 200,
+                    'message' => 'locked'
+                ], JSON_THROW_ON_ERROR);
+                Cache::clearCache();
+                exit(200);
+            }
         }
 
         if(isset($requestBody['collection'])) {
@@ -371,14 +375,17 @@ class DirectusPlugin extends Plugin
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     private function processFlexObjects() {
-
         if(file_exists('user/data/flex-objects/.lock')) {
-            echo json_encode([
-                'status' => 200,
-                'message' => 'locked'
-            ], JSON_THROW_ON_ERROR);
-            Cache::clearCache();
-            exit(200);
+            if(time() - filemtime('user/data/flex-objects/.lock') > ($this->config()['lockfileLifetime'] ?? 120)) {
+                unlink('user/data/flex-objects/.lock');
+            } else {
+                echo json_encode([
+                    'status' => 200,
+                    'message' => 'locked'
+                ], JSON_THROW_ON_ERROR);
+                Cache::clearCache();
+                exit(200);
+            }
         }
 
         $this->delTree('user/data/flex-objects');
