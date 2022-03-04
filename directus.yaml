@@ -3,6 +3,7 @@ imageServer: false
 disableCors: true
 assetsFolderName: assets
 centralizedFileStorage: true
+lockfileLifetime: 120
 env:
   status:
     default: published

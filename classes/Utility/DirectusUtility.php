@@ -196,8 +196,11 @@ class DirectusUtility
             }
         }
 
-        foreach($filters as $field => $filter) {
-            $url .= '&filter[' . $field . ']' . (isset($filter['mm_field']) ? '[' . $filter['mm_field'] . ']' : '') . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
+        foreach($filters as $fields => $filter) {
+
+            $fields = $this->parseFilterString($fields);
+
+            $url .= '&filter' . $fields . (isset($filter['mm_field']) ? '[' . $filter['mm_field'] . ']' : '') . ( isset($filter['operator']) ? '[' . $filter['operator'] . ']' : null ) . '=' . $filter['value'];
         }
         $url .= '&limit=' . (string)$limit;
         if($sort) {
@@ -205,5 +208,22 @@ class DirectusUtility
         }
 
         return $url;
+    }
+
+    /**
+     * @param string $filter
+     * @return string
+     */
+    private function parseFilterString(string $filter) {
+
+        $filterString = '';
+
+        $filterArray = explode('.', $filter);
+
+        foreach($filterArray as $field) {
+            $filterString .= '[' . $field . ']';
+        }
+
+        return $filterString;
     }
 }
